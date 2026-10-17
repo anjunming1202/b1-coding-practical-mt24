@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Protocol
 import numpy as np
 import matplotlib.pyplot as plt
 from .terrain import generate_reference_and_limits
@@ -83,8 +84,18 @@ class Mission:
         return cls(reference, cave_height, cave_depth)
 
 
+class Controller(Protocol):
+    def reset(self) -> None:
+        """Clear internal state (e.g. previous error) before a new simulation."""
+        ...
+
+    def compute_action(self, observation: float, reference: float) -> float:
+        """Return the control action for the current observed depth and reference depth."""
+        ...
+
+
 class ClosedLoop:
-    def __init__(self, plant: Submarine, controller):
+    def __init__(self, plant: Submarine, controller: Controller):
         self.plant = plant
         self.controller = controller
 
@@ -97,11 +108,12 @@ class ClosedLoop:
         positions = np.zeros((T, 2))
         actions = np.zeros(T)
         self.plant.reset_state()
+        self.controller.reset()
 
         for t in range(T):
             positions[t] = self.plant.get_position()
             observation_t = self.plant.get_depth()
-            # Call your controller here
+            actions[t] = self.controller.compute_action(observation_t, mission.reference[t])
             self.plant.transition(actions[t], disturbances[t])
 
         return Trajectory(positions)
