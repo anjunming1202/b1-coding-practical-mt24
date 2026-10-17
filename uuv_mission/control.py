@@ -4,7 +4,7 @@ class PDController:
         self.kd = kd
         self.previous_err: float = 0.0
 
-    def calculate(self, ref: float, obs: float):
+    def compute_action(self, obs: float, ref: float):
         err = ref - obs
         de = err - self.previous_err
         self.previous_err = err
