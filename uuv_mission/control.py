@@ -4,8 +4,8 @@ class PDController:
         self.kd = kd
         self.previous_err: float = 0.0
 
-    def compute_action(self, obs: float, ref: float):
-        err = ref - obs
+    def compute_action(self, observation: float, reference: float) -> float:
+        err = reference - observation
         de = err - self.previous_err
         self.previous_err = err
         return self.kp * err + self.kd * de
