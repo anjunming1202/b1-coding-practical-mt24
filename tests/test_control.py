@@ -28,3 +28,9 @@ def test_reset():
     controller.reset()
     result = controller.compute_action(test_obs, test_ref) #if reset fails, we'll get result = 0.3
     assert result == 1.5 #Black-box / behaviour check
+
+def test_compute_action_accepts_interface_keywords():
+    """Test that PDController matches the Controller interface parameter names."""
+    controller = PDController()
+    result = controller.compute_action(observation=8, reference=10)
+    assert result == 1.5
